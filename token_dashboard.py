@@ -245,11 +245,19 @@ def collect_claude(by_day, by_model):
                 usage = msg.get("usage")
                 if not isinstance(usage, dict):
                     continue
-                uuid = d.get("uuid")
-                if uuid:
-                    if uuid in seen:
+                # Dedup on the API response identity, not the transcript node:
+                # Claude Code copies messages into new session files on resume,
+                # compaction, and branching, each time minting a fresh "uuid".
+                # message.id (with requestId, when present) is stable across
+                # those copies; keying on uuid would never dedup and ~doubles
+                # the totals.
+                key = msg.get("id") or d.get("requestId") or d.get("uuid")
+                req = d.get("requestId")
+                if key is not None:
+                    dedup = (key, req)
+                    if dedup in seen:
                         continue
-                    seen.add(uuid)
+                    seen.add(dedup)
                 day = parse_day(d.get("timestamp"))
                 if not day:
                     continue
