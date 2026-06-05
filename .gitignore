@@ -1,0 +1,16 @@
+# Generated output — contains YOUR usage data, never commit it
+dashboard.html
+data.js
+data.json
+*.tmp
+
+# Scheduler logs (contain absolute local paths)
+agent.log
+agent.err.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Playwright MCP browser-test artifacts
+.playwright-mcp/
